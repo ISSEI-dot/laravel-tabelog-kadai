@@ -1,0 +1,540 @@
+@font-face {
+    font-family: YuGo;
+    src: local(YuGo-Medium),
+      url(/path/to/YuGo-Medium.woff2) format("woff2"),
+      url(/path/to/YuGo-Medium.woff) format("woff"),
+      url(/path/to/YuGo-Medium.ttf) format("truetype");
+    font-weight: 500;
+    font-style: normal;
+    font-stretch: normal;
+  }
+  
+  @font-face {
+    font-family: YuGo;
+    src: local(YuGo-Bold),
+      url(/path/to/YuGo-Bold.woff2) format("woff2"),
+      url(/path/to/YuGo-Bold.woff) format("woff"),
+      url(/path/to/YuGo-Bold.ttf) format("truetype");
+    font-weight: bold;
+    font-style: normal;
+    font-stretch: normal;
+  }
+  
+  h1 {
+    font-family: YuGo;
+    font-size: 26px;
+    font-weight: bold;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: normal;
+    letter-spacing: -0.13px;
+  }
+  
+  h2 {
+    font-family: YuGo;
+    font-size: 22px;
+    font-weight: bold;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: normal;
+    letter-spacing: normal;
+  }
+  
+  h3 {
+    font-family: YuGo;
+    font-size: 18px;
+    font-weight: bold;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: normal;
+    letter-spacing: 0.04px;
+  }
+  
+  big {
+    font-family: YuGo;
+    font-size: 16px;
+    font-weight: 500;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: normal;
+    letter-spacing: 0.08px;
+  }
+  
+  body {
+    font-family: YuGo;
+    font-size: 14px;
+    font-weight: 500;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: normal;
+    letter-spacing: 0.11px;
+  }
+  
+  caption {
+    font-family: YuGo;
+    font-size: 12px;
+    font-weight: 500;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: normal;
+    letter-spacing: 0.08px;
+  }
+  
+  label {
+    font-family: YuGo;
+    font-size: 14px;
+    font-weight: bold;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    color: #191919;
+  }
+
+.kadai_002-login-input {
+    border-radius: 2px;
+    border: solid 1px #b2b2b2;
+    background-color: #ffffff;
+}
+
+.kadai_002-check-label {
+    font-family: YuGo;
+    font-size: 12px;
+    font-weight: 500;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    color: #000000;
+}
+
+.kadai_002-require-input-label {
+    border-radius: 1px;
+    background-color: #e2001b;
+}
+
+.kadai_002-require-input-label-text {
+    font-family: YuGo;
+    font-size: 14px;
+    font-weight: 500;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    color: #ffffff;
+}
+
+.kadai_002-submit-button {
+    font-family: YuGo;
+    font-size: 14px;
+    font-weight: bold;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    color: #ffffff;
+    background-color: #0fbe9f;
+}
+
+.kadai_002-login-text {
+    font-family: YuGo;
+    font-size: 14px;
+    font-weight: bold;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    color: #0fbe9f;
+}
+
+.kadai_002-header-container {
+  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+}
+
+.kadai_002-header-search-input {
+  border: solid 1px #e5e5e5;
+}
+
+.kadai_002-header-search-button {
+  background-color: #0fbe9f;
+}
+
+/* ボタンにマウスを乗せたときのスタイル */
+.kadai_002-header-search-button:hover {
+  background-color: #00a1b3; /* hover時の背景色 */
+  color: #ffffff; /* hover時のアイコン色 */
+}
+
+.kadai_002-header-search-icon {
+  color: #ffffff;
+  transition: color 0.3s ease;
+}
+
+.kadai_002-header-search-button:hover .kadai_002-header-search-icon {
+  color: white; /* hover時でもアイコン色が変わらないように */
+}
+
+.kadai_002-header-fav-icon {
+  color: #191919;
+}
+
+/* 新規登録・ログインリンク */
+.primary {
+  cursor: pointer;
+  font-weight: bold; /* 太字 */
+  color: #333; /* 通常時の色 */
+  transition: color 0.3s ease; /* スムーズな変化 */
+}
+
+.primary:hover {
+  color: #007bff; /* ホバー時の色 */
+}
+
+/* マイページリンク */
+.mypage-link {
+  cursor: pointer;
+  font-weight: bold; /* 太字 */
+  color: #333; /* 通常時の色 */
+  transition: color 0.3s ease; /* スムーズな変化 */
+}
+
+.mypage-link:hover {
+  color: #007bff; /* ホバー時の色 */
+}
+
+/* お気に入りリンク */
+.favorite-link {
+  cursor: pointer;
+  color: #333;
+  transition: color 0.3s ease;
+}
+
+.favorite-link:hover {
+  color: #ff6f61; /* ホバー時の色 */
+}
+
+/* 会社情報リンク */
+.company-link {
+  cursor: pointer;
+  font-weight: bold; /* 太字 */
+  color: #333; /* 通常時の色 */
+  transition: color 0.3s ease;
+}
+
+.company-link:hover {
+  color: #28a745; /* ホバー時の色 */
+}
+
+/* 共通設定: すべての .nav-link クラスに適用 */
+.nav-link {
+  cursor: pointer; /* マウスカーソルを手の形にする */
+  font-weight: bold; /* 太字 */
+}
+
+/* ナビゲーションリンクのスタイル */
+.nav-item-link {
+    font-weight: bold; /* 太字 */
+    font-size: 16px; /* フォントサイズ */
+    color: #333; /* 元の文字色 */
+    text-decoration: none; /* 下線なし */
+    transition: transform 0.2s ease; /* ホバー時のスムーズな拡大 */
+    cursor: pointer; /* マウスカーソルを手の形に */
+}
+
+/* アイコンの余白 */
+.nav-item-link i {
+    margin-right: 5px; /* アイコンと文字の間隔を設定 */
+}
+
+/* ホバー時のエフェクト */
+.nav-item-link:hover {
+    text-decoration: underline; /* ホバー時に下線を表示 */
+    transform: scale(1.05); /* 少しだけ拡大 */
+}
+
+/* マイページ、会社情報、お気に入りの間隔を整える */
+.nav-item {
+    margin-right: 20px; /* 横の間隔を均等に設定 */
+}
+
+/* レスポンシブデザイン（オプションで追加） */
+@media (max-width: 768px) {
+    .nav-item {
+        margin-right: 10px; /* スマホ表示時に間隔を調整 */
+    }
+
+    .nav-item-link {
+        font-size: 14px; /* フォントサイズを少し小さく */
+    }
+}
+
+
+.kadai_002-reserve-button {
+  margin-right: 80px;
+  border-radius: 2px;
+  border: solid 1px #0fbe9f;
+  background-color: #ffffff;
+}
+
+.text-reserve {
+  color: #0fbe9f;
+}
+
+.kadai_002-favorite-button {
+  margin-right: 40px;
+  border-radius: 2px;
+  border: solid 1px #0fbe9f;
+  background-color: #ffffff;
+}
+
+.text-favorite {
+  color: #0fbe9f;
+}
+
+.kadai_002-favorite-item-delete {
+  border-radius: 2px;
+  border: solid 1px #0fbe9f;
+  background-color: #ffffff;
+}
+
+.kadai_002-sidebar-category-label {
+  display: block; /* ラベルをブロック要素にして、下に余白を確保 */
+    margin-bottom:4px; /* ラベルとラベルの間にスペースを追加 */
+    font-size: 14px; /* フォントサイズ */
+    font-weight: bold; /* 太字に設定 */
+    color: #333; /* テキストの色 */
+    text-align: left; /* テキストを左揃え */
+    transition: color 0.3s ease; /* 色の変化にスムーズなトランジションを追加 */
+}
+
+/* リンクのスタイル */
+.kadai_002-sidebar-category-label a {
+    text-decoration: none; /* リンクの下線を削除 */
+    color: #333; /* デフォルトのリンク色 */
+    padding: 5px 10px; /* 内側の余白 */
+    display: inline-block; /* リンクをインラインブロック要素にしてクリック範囲を広げる */
+    border-radius: 5px; /* 角を丸くする */
+}
+
+/* リンクのホバー時のスタイル */
+.kadai_002-sidebar-category-label a:hover {
+    background-color: #007bff; /* ホバー時の背景色 */
+    color: white; /* ホバー時のテキスト色 */
+    text-decoration: none; /* 下線を削除 */
+}
+
+/* リンクがクリックされた時（アクティブ状態） */
+.kadai_002-sidebar-category-label a:active {
+    background-color: #0056b3; /* クリック時の背景色 */
+    color: white; /* クリック時のテキスト色 */
+}
+
+/* カテゴリーラベルの最初のラベルを強調する（例: 最初のカテゴリーに特別なスタイル） */
+.kadai_002-sidebar-category-label:first-child {
+    font-size: 18px; /* 最初のラベルのフォントサイズを大きく */
+    color: #007bff; /* 最初のラベルの色を青に */
+    font-weight: bold; /* 最初のラベルを太字に */
+}
+
+.review-score-color {
+  color: #0fbe9f;
+}
+
+.review-score-color:focus {
+  color: #0fbe9f;
+}
+
+.kadai_002-delete-submit-button {
+  border-radius: 2px;
+  color: #ffffff;
+  background-color: #d94b0e;
+}
+
+.kadai_002-star-rating {
+  position: relative;
+  z-index: 0;
+  display: inline-block;
+  color: #cccccc;
+  white-space: nowrap;
+}
+
+.kadai_002-star-rating::before,
+.kadai_002-star-rating::after {
+  content: "★★★★★";
+}
+
+.kadai_002-star-rating::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  overflow: hidden;
+  color: #0fbe9f;
+  white-space: nowrap;
+}
+
+.kadai_002-star-rating[data-rate="5"]::after {
+  width: 100%;
+}
+
+.kadai_002-star-rating[data-rate="4.5"]::after {
+  width: 90%;
+}
+
+.kadai_002-star-rating[data-rate="4"]::after {
+  width: 80%;
+}
+
+.kadai_002-star-rating[data-rate="3.5"]::after {
+  width: 70%;
+}
+
+.kadai_002-star-rating[data-rate="3"]::after {
+  width: 60%;
+}
+
+.kadai_002-star-rating[data-rate="2.5"]::after {
+  width: 50%;
+}
+
+.kadai_002-star-rating[data-rate="2"]::after {
+  width: 40%;
+}
+
+.kadai_002-star-rating[data-rate="1.5"]::after {
+  width: 30%;
+}
+
+.kadai_002-star-rating[data-rate="1"]::after {
+  width: 20%;
+}
+
+.kadai_002-star-rating[data-rate="0.5"]::after {
+  width: 10%;
+}
+
+.kadai_002-star-rating[data-rate="0"]::after {
+  width: 0%;
+}
+
+.card-header {
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.btn-success {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.d-flex .btn {
+  margin-right: 10px; /* ボタンの間隔を調整 */
+}
+
+/* 会社情報ページ全体の専用スタイル */
+.company-page {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* ビューポート全体の高さ */
+  background-color: #eef2f3; /* ページ背景に淡い色を追加 */
+  font-family: 'Arial', sans-serif;
+}
+
+/* 会社情報セクションのスタイル */
+.company-info {
+  max-width: 800px; /* コンテンツ幅を設定 */
+  width: 90%; /* 横幅をデバイスに応じて調整 */
+  padding: 30px;
+  background-color: #ffffff; /* 背景を白に設定 */
+  border-radius: 15px; /* 角を丸く */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* 深めの影を追加 */
+  text-align: center;
+}
+
+/* 「会社情報」のタイトル */
+.company-info h1 {
+  font-size: 3rem; /* 大きなフォントサイズ */
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+/* セクション見出し */
+.company-info h3 {
+  font-size: 1.8rem;
+  color: #333333;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #007bff; /* 下線を追加 */
+  display: inline-block; /* コンパクトに調整 */
+  padding-bottom: 5px;
+}
+
+/* テキスト部分 */
+.company-info p,
+.company-info li {
+  font-size: 1.2rem;
+  color: #555555;
+  margin-bottom: 15px;
+}
+
+/* リストのスタイル */
+.company-info ul {
+  list-style: none;
+  padding: 0;
+}
+
+.company-info li {
+  margin-bottom: 10px;
+}
+
+/* リンク */
+.company-info a {
+  text-decoration: none;
+  color: #007bff;
+  font-weight: bold;
+}
+
+.company-info a:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+.menu-section {
+  margin-bottom: 30px;
+}
+
+.section-header {
+  display: flex; /* タイトルとボタンを横並びに */
+  justify-content: space-between; /* 両端に配置 */
+  align-items: center; /* 縦方向で中央揃え */
+  margin-bottom: 10px;
+}
+
+.section-header h2 {
+  font-size: 1.5rem;
+  margin: 0;
+  flex: 1; /* タイトルを左に寄せるための柔軟なスペース */
+}
+
+.btn-more {
+  display: inline-block;
+  padding: 5px 10px;
+  background-color: #0fbe9f;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
+  margin-left: 20px; /* ボタンを少し右に余白 */
+}
+
+.btn-more:hover {
+  background-color: #00a1b3;
+}
