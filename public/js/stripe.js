@@ -1,4 +1,4 @@
-const stripe = Stripe(stripeKey);
+const stripe = Stripe("pk_test_51QRRhbBUjnqExYiQXTuTOwhbcr8tKPjeSjqE3sQriC04w7LLhGDTaDWSRk0eigUyO44fbQxhKW8HXDb3cjmu3q3J00kS1Dgnpx");
 const elements = stripe.elements();
 const cardElement = elements.create('card');
 cardElement.mount('#card-element');
@@ -7,51 +7,57 @@ const cardHolderName = document.getElementById('card-holder-name');
 const cardButton = document.getElementById('card-button');
 const clientSecret = cardButton.dataset.secret;
 
-// エラーメッセージを表示するdiv要素を取得する
+// エラーメッセージ表示要素
 const cardError = document.getElementById('card-error');
 const errorList = document.getElementById('error-list');
 
+// ボタンクリック時の処理
 cardButton.addEventListener('click', async (e) => {
     e.preventDefault();
 
-    // ボタンを一時的に無効化
+    // ボタン無効化
     cardButton.disabled = true;
 
-    // クライアントシークレットでセットアップを確認
+    // エラーメッセージ初期化
+    errorList.innerHTML = '';
+    cardError.style.display = 'none';
+
+    // 名義人チェック
+    if (cardHolderName.value.trim() === '') {
+        displayError('カード名義人の入力は必須です。');
+        cardButton.disabled = false; // ボタン再有効化
+        return;
+    }
+
+    // Stripeのセットアップ確認
     const { setupIntent, error } = await stripe.confirmCardSetup(
         clientSecret, {
             payment_method: {
                 card: cardElement,
-                billing_details: { name: cardHolderName.value.trim() } // 空白削除
+                billing_details: { name: cardHolderName.value.trim() }
             }
         }
     );
 
-    // エラー処理
-    errorList.innerHTML = ''; // エラーメッセージ初期化
-
-    if (cardHolderName.value.trim() === '') {
-        cardError.style.display = 'block';
-        let li = document.createElement('li');
-        li.textContent = 'カード名義人の入力は必須です。';
-        errorList.appendChild(li);
-    }
-
     if (error) {
-        console.error(error);
-        cardError.style.display = 'block';
-        let li = document.createElement('li');
-        li.textContent = `エラー: ${error.code} - ${error.message}`;
-        errorList.appendChild(li);
-
-        // ボタンを再度有効化
-        cardButton.disabled = false;
+        // エラー表示
+        displayError(`エラー: ${error.code} - ${error.message}`);
+        cardButton.disabled = false; // ボタン再有効化
     } else {
-        // 支払いIDをフォームに追加
+        // 支払いIDをフォームに追加して送信
         stripePaymentIdHandler(setupIntent.payment_method);
     }
 });
 
+// エラーメッセージ表示関数
+function displayError(message) {
+    cardError.style.display = 'block';
+    let li = document.createElement('li');
+    li.textContent = message;
+    errorList.appendChild(li);
+}
+
+// 支払いIDフォーム追加関数
 function stripePaymentIdHandler(paymentMethodId) {
     const form = document.getElementById('card-form');
 
@@ -61,6 +67,6 @@ function stripePaymentIdHandler(paymentMethodId) {
     hiddenInput.setAttribute('value', paymentMethodId);
     form.appendChild(hiddenInput);
 
-    // フォームを送信
+    // フォーム送信
     form.submit();
 }

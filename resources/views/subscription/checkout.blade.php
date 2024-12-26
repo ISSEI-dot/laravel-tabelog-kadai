@@ -10,7 +10,7 @@
             <input id="card-holder-name" type="text" class="form-control" placeholder="例: 山田 太郎" required>
         </div>
         <div id="card-element" class="form-group mt-3"></div>
-        <div id="card-errors" class="text-danger mt-3"></div>
+        <div id="card-errors" class="text-danger mt-3" style="display: none;"></div>
         <button id="card-button" class="btn btn-primary mt-3" data-secret="{{ $intent->client_secret }}">
             サブスクリプションを開始
         </button>
@@ -19,7 +19,7 @@
 
 <script src="https://js.stripe.com/v3/"></script>
 <script>
-    const stripe = Stripe("{{ config('') }}");
+    const stripe = Stripe("{{ config('services.stripe.key') }}");
     const elements = stripe.elements();
     const cardElement = elements.create('card');
     cardElement.mount('#card-element');
@@ -35,16 +35,21 @@
             payment_method: {
                 card: cardElement,
                 billing_details: {
-                    name: cardHolderName.value
+                    name: cardHolderName.value.trim() // トリムで余分なスペース削除
                 }
             }
         });
 
+        const errorDisplay = document.getElementById('card-errors');
+        errorDisplay.innerHTML = ''; // 初期化
+
         if (error) {
-            // エラー表示エリアにエラー内容を表示
-            const errorDisplay = document.getElementById('card-errors');
+            // エラーメッセージ表示
+            errorDisplay.style.display = 'block';
             errorDisplay.textContent = error.message;
+    card    Button.disabled = false; // ボタンを再度有効化
         } else {
+            // 支払いIDをフォームに追加して送信
             const form = document.getElementById('payment-form');
             const hiddenInput = document.createElement('input');
             hiddenInput.setAttribute('type', 'hidden');

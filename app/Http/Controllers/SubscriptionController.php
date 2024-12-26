@@ -16,23 +16,7 @@ class SubscriptionController extends Controller
 
         // Stripe顧客IDが存在しない場合、新規作成
         if (!$user->stripe_id) {
-            $stripeCustomer = $user->createAsStripeCustomer();
-        }
-
-        // SetupIntentを作成
-        $intent = $user->createSetupIntent();
-
-        return view('subscription.create', compact('intent'));
-
-
-        // ユーザーがログインしていることを確認
-        if (!$user) {
-            return redirect()->route('login')->with('error', 'ログインが必要です。');
-        }
-
-        // createSetupIntentが存在するか確認
-        if (!method_exists($user, 'createSetupIntent')) {
-            abort(500, 'SetupIntentを作成することができません。');
+            $user->createAsStripeCustomer();
         }
 
         // SetupIntentを作成
@@ -40,6 +24,7 @@ class SubscriptionController extends Controller
 
         return view('subscription.create', compact('intent'));
     }
+
 
     // 有料プラン登録機能
     public function store(Request $request)
@@ -51,30 +36,15 @@ class SubscriptionController extends Controller
             'paymentMethodId' => 'required|string',
         ]);
 
-        // 既に登録済みか確認
-        if ($user->subscribed('premium_plan')) {
-        return redirect()->route('mypage')->with('flash_message', '既に有料プランに登録済みです。');
-        }
-
         try {
             // 有料プラン登録
             $user->newSubscription('premium_plan', 'price_1QZOJQBUjnqExYiQySxVRZ74')
                 ->create($request->paymentMethodId);
 
-            // **ここでステータスを強制的に「active」に更新**
-            $user->subscriptions()->update([
-                'stripe_status' => 'active'
-            ]);
-
-            return redirect()->route('mypage')->with('flash_message', '有料プランへの登録が完了しました。');
+            return redirect()->route('mypage')->with('success', '有料プランへの登録が完了しました。');
         } catch (\Exception $e) {
             // エラーログを記録
-            \Log::error('有料プラン登録エラー: ' . $e->getMessage(), [
-            'user_id' => $user->id,
-            'payment_method_id' => $request->paymentMethodId,
-            ]);
-
-            // エラーメッセージを表示
+            \Log::error('サブスクリプション登録エラー: ' . $e->getMessage());
             return back()->withErrors(['error' => '登録中に問題が発生しました。再度お試しください。']);
         }
     }
@@ -162,27 +132,40 @@ class SubscriptionController extends Controller
             // サブスクリプションの取得
             $subscription = $user->subscription('premium_plan');
 
-            if (!$subscription || $subscription->cancelled()) {
-                return redirect()->route('mypage')->withErrors(['error' => '有料プランに未登録、または既に解約済みです。']);
+            if (!$subscription) {
+                return back()->withErrors(['error' => '登録されていません。']);
             }
 
-            // サブスクリプションを即時解約
-            $subscription->cancelNow();
+            // サブスクリプションを解約
+            $subscription->cancel();
 
             // ステータスを強制的に更新
             $user->subscriptions()->update([
                 'stripe_status' => 'canceled'
             ]);
 
-                return redirect()->route('mypage')->with('flash_message', '有料プランを解約しました。');
+                return redirect()->route('mypage')->with('message', '有料プランを解約しました。');
             } catch (\Exception $e) {
-            // エラーをログに記録
-            \Log::error('サブスクリプション解約中にエラーが発生しました: ' . $e->getMessage(), [
-                'user_id' => $user->id,
-            ]);
-
-            return back()->withErrors(['error' => '解約処理中に問題が発生しました。再度お試しください。']);
+            
+                return back()->withErrors(['error' => $e->getMessage()]);
         }
     }
+
+    public function showCheckoutForm()
+{
+    $user = Auth::user();
+
+    // 顧客IDがなければ作成
+    if (!$user->stripe_id) {
+        $user->createAsStripeCustomer();
+    }
+
+    // SetupIntentを作成
+    $intent = $user->createSetupIntent();
+
+    // checkout.blade.php に intent を渡す
+    return view('subscription.checkout', compact('intent'));
+}
+
 
 }

@@ -4,7 +4,7 @@
 <script src="https://js.stripe.com/v3/"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const stripe = Stripe("{{ env('STRIPE_KEY') }}"); // Stripeキーを設定
+        const stripe = Stripe("{{ config('services.stripe.key') }}");
         const elements = stripe.elements();
         const cardElement = elements.create('card'); // カード要素を作成
         cardElement.mount('#card-element'); // DOMにマウント

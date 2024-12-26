@@ -3,7 +3,7 @@
 @push('scripts')
     <script src="https://js.stripe.com/v3/"></script>
     <script>
-        const stripeKey = "{{ env('STRIPE_KEY') }}";
+        const stripeKey = "{{ config('services.stripe.key') }}";
     </script>
     <script src="{{ asset('/js/stripe.js') }}"></script>
 @endpush

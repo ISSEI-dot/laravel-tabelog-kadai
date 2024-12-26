@@ -57,5 +57,6 @@ function stripePaymentIdHandler(paymentMethodId) {
   hiddenInput.setAttribute('value', paymentMethodId);
   form.appendChild(hiddenInput);
 
+  cardButton.disabled = true; // ボタンを無効化
   form.submit();
 }

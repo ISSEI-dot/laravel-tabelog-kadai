@@ -68,7 +68,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
+// サブスクリプション登録ページ表示
 Route::get('/subscription/checkout', [SubscriptionController::class, 'showCheckoutForm'])->name('subscription.checkout');
+
+// サブスクリプション登録処理
+Route::post('/subscription/store', [SubscriptionController::class, 'store'])->name('subscription.store');
 
 Route::post('/stripe/webhook',[WebhookController::class, 'handleWebhook']);
 
