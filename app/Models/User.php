@@ -16,7 +16,7 @@ use Overtrue\LaravelFavorite\Favorite;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable, Favoriter, SoftDeletes,Billable;
+    use HasApiTokens, HasFactory, Notifiable, Favoriter, SoftDeletes, Billable;
  
     protected $dates = ['deleted_at'];
 

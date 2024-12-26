@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\SubscriptionController;
 use Laravel\Cashier\Http\Controllers\WebhookController;
 use App\Http\Controllers\ReservationController;
-use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CompanyInfoController;
 use App\Http\Controllers\FavoriteController;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,11 +52,23 @@ Auth::routes(['verify' => true]);
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-Route::middleware(['auth'])->group(function () {
-    Route::post('/create-setup-intent', [SubscriptionController::class, 'createSetupIntent']);
+Route::middleware(['auth', 'verified'])->group(function () {
+    // 有料プラン未登録ユーザー用のルート
+    Route::middleware(['notSubscribed'])->group(function () {
+        Route::get('subscription/create', [SubscriptionController::class, 'create'])->name('subscription.create');
+        Route::post('subscription', [SubscriptionController::class, 'store'])->name('subscription.store');
+    });
+
+    // 有料プラン登録済みユーザー用のルート
+    Route::middleware(['subscribed'])->group(function () {
+        Route::get('subscription/edit', [SubscriptionController::class, 'edit'])->name('subscription.edit');
+        Route::put('subscription', [SubscriptionController::class, 'update'])->name('subscription.update');
+        Route::get('subscription/cancel', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
+        Route::delete('subscription', [SubscriptionController::class, 'destroy'])->name('subscription.destroy');
+    });
 });
 
-Route::post('/subscribe', [SubscriptionController::class, 'subscribe']);
+Route::get('/subscription/checkout', [SubscriptionController::class, 'showCheckoutForm'])->name('subscription.checkout');
 
 Route::post('/stripe/webhook',[WebhookController::class, 'handleWebhook']);
 

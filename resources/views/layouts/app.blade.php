@@ -33,5 +33,6 @@
         @component('components.footer')
         @endcomponent
     </div>
+    @stack('scripts')
 </body>
 </html>

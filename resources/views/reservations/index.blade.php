@@ -1,6 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
+
+<div class="container">
+    <span>
+    <a href="{{ route('mypage') }}">マイページ</a> > パスワード変更
+    </span>
+
 <div class="container mt-5">
     <!-- フラッシュメッセージの表示 -->
     @if (session('success'))
@@ -15,7 +21,10 @@
         </div>
     @endif
 
-    <h3 class="text-center mb-4">予約履歴</h3>
+    <h1 class="text-center mb-4">予約履歴</h1>
+    
+    <hr>
+
     <div class="row">
         @foreach ($reservations as $reservation)
         <div class="col-md-4 col-sm-6 mb-4"> <!-- 1行に3列 (中画面以上), 2列 (小画面) -->

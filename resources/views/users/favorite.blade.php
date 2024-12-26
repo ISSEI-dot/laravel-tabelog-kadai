@@ -1,6 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
+
+<div class="container">
+    <span>
+    <a href="{{ route('mypage') }}">マイページ</a> > パスワード変更
+    </span>
+
 <div class="container  d-flex justify-content-center mt-3">
     <div class="w-75">
         <h1>お気に入り</h1>
