@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Laravel\Cashier\Cashier;
 
 
 class SubscriptionController extends Controller
@@ -25,6 +24,22 @@ class SubscriptionController extends Controller
         return view('subscription.create', compact('intent'));
     }
 
+    // チェックアウトページ表示
+    public function showCheckoutForm()
+    {
+        $user = Auth::user();
+
+        // Stripe顧客が未登録の場合は作成
+        if (!$user->stripe_id) {
+            $user->createAsStripeCustomer();
+        }
+
+        // SetupIntentを作成
+        $intent = $user->createSetupIntent();
+
+        return view('subscription.checkout', compact('intent'));
+    }
+
 
     // 有料プラン登録機能
     public function store(Request $request)
@@ -37,6 +52,8 @@ class SubscriptionController extends Controller
         ]);
 
         try {
+            // 支払い方法を更新
+            $user->updateDefaultPaymentMethod($request->paymentMethodId);
             // 有料プラン登録
             $user->newSubscription('premium_plan', 'price_1QZOJQBUjnqExYiQySxVRZ74')
                 ->create($request->paymentMethodId);
@@ -117,7 +134,7 @@ class SubscriptionController extends Controller
 
         // サブスクリプションが存在しない場合のエラーハンドリング
         if (!$subscription) {
-            return redirect()->route('mypage')->withErrors(['error' => '現在、有料プランには登録されていません。']);
+            return redirect()->route('mypage')->withErrors(['status' => '現在、有料プランには登録されていません。']);
         }
 
         return view('subscription.cancel', compact('subscription'));
@@ -146,26 +163,8 @@ class SubscriptionController extends Controller
 
                 return redirect()->route('mypage')->with('message', '有料プランを解約しました。');
             } catch (\Exception $e) {
-            
                 return back()->withErrors(['error' => $e->getMessage()]);
         }
     }
-
-    public function showCheckoutForm()
-{
-    $user = Auth::user();
-
-    // 顧客IDがなければ作成
-    if (!$user->stripe_id) {
-        $user->createAsStripeCustomer();
-    }
-
-    // SetupIntentを作成
-    $intent = $user->createSetupIntent();
-
-    // checkout.blade.php に intent を渡す
-    return view('subscription.checkout', compact('intent'));
-}
-
 
 }

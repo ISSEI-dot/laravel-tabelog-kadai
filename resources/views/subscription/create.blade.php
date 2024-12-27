@@ -1,65 +1,84 @@
 @extends('layouts.app')
 
 @push('scripts')
+<!-- Stripe.jsのロード -->
 <script src="https://js.stripe.com/v3/"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const stripe = Stripe("{{ config('services.stripe.key') }}");
-        const elements = stripe.elements();
-        const cardElement = elements.create('card'); // カード要素を作成
+
+        // 1. Stripeのセットアップ
+        const stripe = Stripe("{{ config('services.stripe.key') }}"); // 環境変数からキーを取得
+        const elements = stripe.elements(); // Stripe要素の生成
+        const cardElement = elements.create('card'); // カード要素作成
         cardElement.mount('#card-element'); // DOMにマウント
 
+        // 2. DOM要素の取得
+        const form = document.getElementById('card-form');
         const cardButton = document.getElementById('card-button');
-        const clientSecret = cardButton.dataset.secret;
+        const cardHolderName = document.getElementById('card-holder-name');
+        const clientSecret = cardButton.dataset.secret; // シークレットキー取得
+        const errorDiv = document.getElementById('card-errors');
 
-        // エラーメッセージの管理
+        // 3. エラー表示管理
         cardElement.on('change', function (event) {
-            const errorDiv = document.getElementById('card-errors');
-            if (event.error) {
-                errorDiv.textContent = event.error.message;
-                errorDiv.style.display = 'block';
-            } else {
-                errorDiv.textContent = '';
-                errorDiv.style.display = 'none';
-            }
+            errorDiv.textContent = event.error ? event.error.message : ''; // エラーメッセージ管理
+            errorDiv.style.display = event.error ? 'block' : 'none'; // 表示切り替え
         });
 
-        // フォーム送信処理
-        const form = document.getElementById('card-form');
+        // 4. フォーム送信処理
         form.addEventListener('submit', async (e) => {
-            e.preventDefault(); // フォーム送信を一旦停止
+            e.preventDefault(); // フォーム送信を停止
 
+            // 入力チェック
+            if (!cardHolderName.value.trim()) {
+                showError('カード名義人を入力してください。');
+                return;
+            }
+
+            // ボタン無効化（二重クリック防止）
+            cardButton.disabled = true;
+
+            // Stripeのカードセットアップ処理
             const { setupIntent, error } = await stripe.confirmCardSetup(
                 clientSecret,
                 {
                     payment_method: {
                         card: cardElement,
                         billing_details: {
-                            name: document.getElementById('card-holder-name').value,
+                            name: cardHolderName.value.trim(),
                         },
                     },
                 }
             );
 
             if (error) {
-                // エラーが発生した場合
-                const errorDiv = document.getElementById('card-errors');
-                errorDiv.textContent = error.message;
-                errorDiv.style.display = 'block';
+                // エラー発生時
+                showError(error.message); // エラーメッセージ表示
+                console.error('Stripeエラー:', error); // デバッグ用
+                cardButton.disabled = false; // ボタン再有効化
             } else {
-                // 成功した場合、トークンをフォームに追加して送信
-                const hiddenInput = document.createElement('input');
-                hiddenInput.type = 'hidden';
-                hiddenInput.name = 'payment_method';
-                hiddenInput.value = setupIntent.payment_method;
-                form.appendChild(hiddenInput);
-
-                form.submit(); // フォームを送信
+                // 成功時：トークンをフォームに追加して送信
+                addHiddenInput(form, 'payment_method', setupIntent.payment_method);
+                form.submit();
             }
         });
+
+        // 5. エラー表示処理
+        function showError(message) {
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        // 6. 隠しフィールド追加処理
+        function addHiddenInput(form, name, value) {
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = name;
+            hiddenInput.value = value;
+            form.appendChild(hiddenInput);
+        }
     });
 </script>
-
 @endpush
 
 @section('content')
@@ -74,6 +93,22 @@
             </nav>
 
             <h1 class="mb-3 text-center">有料プラン登録</h1>
+
+            @if (session('success'))
+                <div class="alert alert-success" role="alert">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div class="alert alert-danger" role="alert">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
             <hr>
 
@@ -104,14 +139,22 @@
 
             <form id="card-form" action="{{ route('subscription.store') }}" method="post">
                 @csrf
+
+                @if (session('error'))
+                    <div class="alert alert-danger" role="alert">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
                 <input class="form-control mb-3" id="card-holder-name" type="text" placeholder="カード名義人" required>
                 <div class="kadai_002-card-element mb-4" id="card-element" style="border: 1px solid #ccc; padding: 10px; border-radius: 5px;"></div>
                 <div id="card-errors" class="text-danger mb-3" role="alert" style="display: none;"></div>
                 <div class="d-flex justify-content-center">
-                    <button class="btn btn-primary text-white shadow-sm w-50 kadai_002-btn" id="card-button" data-secret="{{ $intent->client_secret }}">登録</button>
+                    <button class="btn btn-primary text-white shadow-sm w-50 kadai_002-btn" id="card-button" data-secret="{{ $intent->client_secret }}">
+                        サブスクリプションを開始
+                    </button>
                 </div>
-            </form>
-            
+            </form>           
         </div>
     </div>
 </div>

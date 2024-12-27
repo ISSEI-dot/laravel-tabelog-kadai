@@ -22,6 +22,22 @@
 
                 <h1 class="mb-3 text-center" id="test">お支払い方法</h1>
 
+                @if (session('success'))
+                    <div class="alert alert-success" role="alert">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="alert alert-danger" role="alert">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <hr>
 
                 <div class="container mb-4">
