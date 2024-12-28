@@ -5,40 +5,21 @@
 <script src="https://js.stripe.com/v3/"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        const stripe = Stripe("{{ config('services.stripe.key') }}");
+        const elements = stripe.elements();
+        const cardElement = elements.create('card');
+        cardElement.mount('#card-element');
 
-        // 1. Stripeのセットアップ
-        const stripe = Stripe("{{ config('services.stripe.key') }}"); // 環境変数からキーを取得
-        const elements = stripe.elements(); // Stripe要素の生成
-        const cardElement = elements.create('card'); // カード要素作成
-        cardElement.mount('#card-element'); // DOMにマウント
-
-        // 2. DOM要素の取得
         const form = document.getElementById('card-form');
         const cardButton = document.getElementById('card-button');
         const cardHolderName = document.getElementById('card-holder-name');
-        const clientSecret = cardButton.dataset.secret; // シークレットキー取得
+        const clientSecret = cardButton.dataset.secret;
         const errorDiv = document.getElementById('card-errors');
 
-        // 3. エラー表示管理
-        cardElement.on('change', function (event) {
-            errorDiv.textContent = event.error ? event.error.message : ''; // エラーメッセージ管理
-            errorDiv.style.display = event.error ? 'block' : 'none'; // 表示切り替え
-        });
-
-        // 4. フォーム送信処理
         form.addEventListener('submit', async (e) => {
-            e.preventDefault(); // フォーム送信を停止
+            e.preventDefault();
+            cardButton.disabled = true; // 二重送信防止
 
-            // 入力チェック
-            if (!cardHolderName.value.trim()) {
-                showError('カード名義人を入力してください。');
-                return;
-            }
-
-            // ボタン無効化（二重クリック防止）
-            cardButton.disabled = true;
-
-            // Stripeのカードセットアップ処理
             const { setupIntent, error } = await stripe.confirmCardSetup(
                 clientSecret,
                 {
@@ -52,34 +33,27 @@
             );
 
             if (error) {
-                // エラー発生時
-                showError(error.message); // エラーメッセージ表示
-                console.error('Stripeエラー:', error); // デバッグ用
-                cardButton.disabled = false; // ボタン再有効化
+                errorDiv.textContent = error.message;
+                errorDiv.style.display = 'block';
+                cardButton.disabled = false;
             } else {
-                // 成功時：トークンをフォームに追加して送信
-                addHiddenInput(form, 'payment_method', setupIntent.payment_method);
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'payment_method';
+                hiddenInput.value = setupIntent.payment_method;
+                form.appendChild(hiddenInput);
                 form.submit();
             }
         });
 
-        // 5. エラー表示処理
-        function showError(message) {
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-        }
-
-        // 6. 隠しフィールド追加処理
-        function addHiddenInput(form, name, value) {
-            const hiddenInput = document.createElement('input');
-            hiddenInput.type = 'hidden';
-            hiddenInput.name = name;
-            hiddenInput.value = value;
-            form.appendChild(hiddenInput);
-        }
+        cardElement.on('change', function (event) {
+            errorDiv.textContent = event.error ? event.error.message : '';
+            errorDiv.style.display = event.error ? 'block' : 'none';
+        });
     });
 </script>
 @endpush
+
 
 @section('content')
 <div class="container kadai_002-container pb-5">
