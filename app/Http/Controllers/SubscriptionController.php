@@ -19,53 +19,31 @@ class SubscriptionController extends Controller
 
     }
 
-    // チェックアウトページ表示
-    public function showCheckoutForm()
-    {
-        $user = Auth::user();
-
-        // Stripe顧客が未登録の場合は作成
-        if (!$user->stripe_id) {
-            $user->createAsStripeCustomer();
-        }
-
-        // SetupIntentを作成
-        $intent = $user->createSetupIntent();
-
-        return view('subscription.checkout', compact('intent'));
-    }
-
-
     // 有料プラン登録機能
     public function store(Request $request)
     {
         $user = Auth::user();
 
-        // バリデーション
-        // $request->validate([
-        //     'paymentMethodId' => 'required',
-        // ], [
-        //     'paymentMethodId.required' => '支払い方法の選択が必要です。',
-        // ]);
-
         try {
             // 支払い方法を更新
-            $user->updateDefaultPaymentMethod($request->paymentMethod);
+            $user->updateDefaultPaymentMethod($request->payment_method);
+
             // 有料プラン登録
             $user->newSubscription('premium_plan', 'price_1QZOJQBUjnqExYiQySxVRZ74')
-                ->create($request->paymentMethod);
+             ->create($request->payment_method);
 
-                    return redirect()->route('mypage')->with('success', '有料プランへの登録が完了しました。');
-                } catch (IncompletePayment $e) {
-                    return redirect()->route('cashier.payment', $e->payment->id);
-                } catch (\Exception $e) {
-                // エラーログの記録
-                \Log::error('サブスクリプション登録エラー: ' . $e->getMessage());
-        
-                // エラーメッセージ表示
-                return back()->withErrors(['error' => '登録中に問題が発生しました。再度お試しください。']);
-            }
+            // 登録完了メッセージ
+            return redirect()->route('mypage')->with('success', '有料プランへの登録が完了しました。');
+        } catch (\Laravel\Cashier\Exceptions\IncompletePayment $e) {
+            // 支払い未完了の場合は支払いページへリダイレクト
+            return redirect()->route('cashier.payment', $e->payment->id);
+        } catch (\Exception $e) {
+            // エラーログとエラーメッセージ表示
+            \Log::error('サブスクリプション登録エラー: ' . $e->getMessage());
+            return back()->withErrors(['error' => '登録中に問題が発生しました。再度お試しください。']);
         }
+    }
+
 
 
     // お支払い方法編集ページ
@@ -99,33 +77,25 @@ class SubscriptionController extends Controller
     {
         $user = Auth::user();
 
-        // バリデーション
-        $validated = $request->validate([
-            'paymentMethodId' => 'required|string',
-        ]);
-
         try {
-            // 1. 支払い方法の更新
-            $user->updateDefaultPaymentMethod($validated['paymentMethodId']);
+            // 支払い方法の更新
+            $user->updateDefaultPaymentMethod($request->payment_method);
 
-            // 2. Stripeから最新のサブスクリプション状態を取得
+            // サブスクリプションの状態をチェック
             $subscription = $user->subscription('premium_plan');
             if (!$subscription) {
                 return back()->withErrors(['error' => 'サブスクリプションが見つかりません。']);
             }
 
-            // 3. 更新後の確認
-            if ($subscription->valid()) {
-                return redirect()->route('mypage')->with('flash_message', 'お支払い方法を変更しました。');
-            } else {
-                return back()->withErrors(['error' => '支払い方法は更新されましたが、サブスクリプション状態に問題があります。']);
-            }
+            // 更新成功メッセージ
+            return redirect()->route('mypage')->with('flash_message', 'お支払い方法を変更しました。');
         } catch (\Exception $e) {
-            // エラー処理
+            // エラーログとエラーメッセージ表示
             \Log::error('支払い方法の更新エラー: ' . $e->getMessage());
             return back()->withErrors(['error' => 'お支払い方法の変更中にエラーが発生しました。']);
         }
     }
+
 
 
     // 有料プラン解約ページ
@@ -160,18 +130,14 @@ class SubscriptionController extends Controller
             // サブスクリプションを解約
             $subscription->cancel();
 
-            // 状態チェック
-            if ($subscription->onGracePeriod()) {
-                return redirect()->route('mypage')->with('message', '有料プランを解約しました。有効期限終了後にキャンセルされます。');
-            } else {
-                return redirect()->route('mypage')->with('message', '有料プランを即時解約しました。');
-            }
-
+            // 解約メッセージ
+            return redirect()->route('mypage')->with('message', '有料プランを解約しました。');
         } catch (\Exception $e) {
             \Log::error('解約エラー: ' . $e->getMessage());
             return back()->withErrors(['error' => '解約処理に失敗しました。再度お試しください。']);
         }
     }
+
 }
 
 

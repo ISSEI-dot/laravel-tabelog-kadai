@@ -63,7 +63,7 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 
-Route::post('/stripe/webhook',[WebhookController::class, 'handleWebhook']);
+Route::post('/webhook/stripe', [WebhookController::class, 'handleWebhook']);
 
 Route::resource('reservations', ReservationController::class);
 
