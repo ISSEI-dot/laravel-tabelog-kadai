@@ -124,7 +124,7 @@
                 <div class="kadai_002-card-element mb-4" id="card-element" style="border: 1px solid #ccc; padding: 10px; border-radius: 5px;"></div>
                 <div id="card-errors" class="text-danger mb-3" role="alert" style="display: none;"></div>
                 <div class="d-flex justify-content-center">
-                    <button class="btn btn-primary text-white shadow-sm w-50 kadai_002-btn" id="card-button" data-secret="{{ $intent->client_secret }}">
+                    <button class="btn btn-primary text-white shadow-sm w-50 kadai_002-btn" id="card-button" data-secret="">
                         サブスクリプションを開始
                     </button>
                 </div>

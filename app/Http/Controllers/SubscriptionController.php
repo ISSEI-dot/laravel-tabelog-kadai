@@ -41,6 +41,13 @@ class SubscriptionController extends Controller
     {
         $user = Auth::user();
 
+        // バリデーション
+        // $request->validate([
+        //     'paymentMethodId' => 'required',
+        // ], [
+        //     'paymentMethodId.required' => '支払い方法の選択が必要です。',
+        // ]);
+
         try {
             // 支払い方法を更新
             $user->updateDefaultPaymentMethod($request->paymentMethod);
