@@ -14,7 +14,7 @@ class ReservationController extends Controller
     public function create(Product $product)
     {
         $regular_holidays = $product->regular_holiday ? explode(',', $product->regular_holiday) : [];
-return view('reservations.create', compact('product', 'regular_holidays'));
+        return view('reservations.create', compact('product', 'regular_holidays'));
 
     }
 
@@ -77,7 +77,8 @@ return view('reservations.create', compact('product', 'regular_holidays'));
     {
         // ログイン中のユーザーが関連する product_id の予約を取得
         // 例: `products` テーブルでユーザーと関連付けされた user_id を利用する場合
-        $reservations = Reservation::where('user_id', auth()->id())->get();
+        $reservations = Reservation::where('user_id', auth()->id())->orderBy('reservation_date', 'desc')
+        ->paginate(9); // ページネーションを追加
 
         // ビューにデータを渡して表示
         return view('reservations.index', compact('reservations'));

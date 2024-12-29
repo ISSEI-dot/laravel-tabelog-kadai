@@ -131,6 +131,11 @@ class ProductController extends Controller
 
     public function favorite(Product $product)
      {
+        // サブスク登録者のみ許可
+        if (!Auth::user()->subscribed('default')) {
+            return redirect()->route('mypage')->with('error', 'お気に入り機能を利用するには有料プランに登録してください。');
+        }
+
          Auth::user()->togglefavorite($product);
  
          return back();

@@ -44,41 +44,56 @@ Route::post('/reviews/{review}', [ReviewController::class, 'update'])->name('rev
 // 削除用
 Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 
-Route::get('products/{product}/favorite', [ProductController::class, 'favorite'])->name('products.favorite');
+Route::post('products/{product}/favorite', [ProductController::class, 'favorite'])->name('products.favorite');
 
 Route::resource('products', ProductController::class)->middleware(['auth', 'verified']);
 Auth::routes(['verify' => true]);
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/subscription/create', [SubscriptionController::class, 'create'])->name('subscription.create');
-    Route::post('/subscription/store', [SubscriptionController::class, 'store'])->name('subscription.store');
+Route::middleware('auth')->group(function () {
 
-    Route::middleware(['subscribed'])->group(function () {
-        Route::get('/subscription/edit', [SubscriptionController::class, 'edit'])->name('subscription.edit');
-        Route::post('/subscription/update', [SubscriptionController::class, 'update'])->name('subscription.update');
-        Route::get('/subscription/cancel', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
-        Route::delete('/subscription', [SubscriptionController::class, 'destroy'])->name('subscription.destroy');
+    // マイページ
+    Route::get('/mypage', function () {
+        return view('users.mypage');
+    })->name('mypage');
+
+    // 有料プラン登録ページ (サブスク未登録者のみ)
+    Route::middleware('not.subscribed')->group(function () {
+        Route::get('/subscription', [SubscriptionController::class, 'showSubscriptionPage'])->name('subscription.index');
+        Route::post('/subscription', [SubscriptionController::class, 'processSubscription'])->name('subscription.process');
     });
+
+    // お支払い方法編集と解約 (サブスク登録者のみ)
+    Route::middleware('subscribed')->group(function () {
+        Route::get('/subscription/edit', [SubscriptionController::class, 'showEditPaymentPage'])->name('subscription.edit');
+        Route::post('/subscription/edit', [SubscriptionController::class, 'updatePaymentMethod'])->name('subscription.update');
+
+        Route::get('/subscription/cancel', function () {
+            return view('subscription.cancel');
+        })->name('subscription.cancel');
+        Route::post('/subscription/cancel', [SubscriptionController::class, 'cancelSubscription'])->name('subscription.cancel.process');
+    
+        //予約履歴ページ（サブスク登録者のみ）
+        Route::get('/mypage/reservations', [ReservationController::class, 'index'])->name('mypage.reservations');
+
+        // 予約フォームと予約処理（サブスク登録者のみ）
+        Route::get('/products/{product}/reservations/create', [ReservationController::class, 'create'])
+            ->name('reservations.create');
+        Route::post('/products/{product}/reservations/store', [ReservationController::class, 'store'])
+            ->name('reservations.store');
+    });
+
+    // サブスクリプション状態確認 (認証必須)
+    Route::get('/subscription/status', [SubscriptionController::class, 'checkSubscriptionStatus'])->name('subscription.status');
 });
 
 Route::post('/webhook/stripe', [WebhookController::class, 'handleWebhook']);
-
-Route::resource('reservations', ReservationController::class);
-
-Route::prefix('products/{product}')->group(function () {
-    Route::get('reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
-    Route::post('reservations/store', [ReservationController::class, 'store'])->name('reservations.store');
-});
 
 Route::delete('reservations/{reservation}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
 
 Route::get('/reservations/{reservation}/complete', [ReservationController::class, 'complete'])
     ->name('reservations.complete');
-
-Route::get('/mypage/reservations', [ReservationController::class, 'index'])
-    ->name('mypage.reservations')->middleware('auth'); // 認証済みユーザーのみアクセス可能
 
 Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations.index');
 Route::delete('/reservations/{id}/cancel', [ReservationController::class, 'cancel'])->name('reservations.cancel')->middleware('auth'); // 認証済みユーザーのみアクセス可能]

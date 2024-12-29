@@ -4,7 +4,7 @@
 
 <div class="container">
     <span>
-    <a href="{{ route('mypage') }}">マイページ</a> > パスワード変更
+    <a href="{{ route('mypage') }}">マイページ</a> > 予約履歴
     </span>
 
 <div class="container mt-5">
@@ -79,5 +79,9 @@
         </div>
         @endforeach
     </div>
+    <!-- ページネーションリンクの追加 -->
+<div class="d-flex justify-content-center mt-4">
+    {{ $reservations->links() }}
+</div>
 </div>
 @endsection

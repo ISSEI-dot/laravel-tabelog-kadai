@@ -17,6 +17,11 @@ class ReviewController extends Controller
      */
     public function store(Request $request)
     {
+        // サブスク登録者のみ許可
+        if (!Auth::user()->subscribed('default')) {
+            return redirect()->route('mypage')->with('error', 'レビューを投稿するには有料プランに登録してください。');
+        }
+
         $request->validate([
             'content' => 'required'
         ]);
@@ -33,6 +38,11 @@ class ReviewController extends Controller
 
     public function edit(Review $review)
     {
+        // サブスク登録者のみ許可
+        if (!Auth::user()->subscribed('default')) {
+            return redirect()->route('mypage')->with('error', 'レビューを編集するには有料プランに登録してください。');
+        }
+
         // ログインユーザーがレビューの作成者でなければ403エラーを返す
         if (Auth::id() !== $review->user_id) {
             abort(403, 'Unauthorized action.');
@@ -43,6 +53,11 @@ class ReviewController extends Controller
 
     public function update(Request $request, Review $review)
     {
+        // サブスク登録者のみ許可
+        if (!Auth::user()->subscribed('default')) {
+            return redirect()->route('mypage')->with('error', 'レビューを更新するには有料プランに登録してください。');
+        }
+
         // ログインユーザーがレビューの作成者でなければ403エラーを返す
         if (Auth::id() !== $review->user_id) {
             abort(403, 'Unauthorized action.');
@@ -63,6 +78,11 @@ class ReviewController extends Controller
 
     public function destroy(Review $review)
     {
+        // サブスク登録者のみ許可
+        if (!Auth::user()->subscribed('default')) {
+            return redirect()->route('mypage')->with('error', 'レビューを削除するには有料プランに登録してください。');
+        }
+
         // ログインユーザーがレビューの作成者でなければ403エラーを返す
         if (Auth::id() !== $review->user_id) {
             abort(403, 'Unauthorized action.');

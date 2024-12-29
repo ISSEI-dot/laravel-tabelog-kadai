@@ -4,10 +4,10 @@
 
 <div class="container">
     <span>
-    <a href="{{ route('mypage') }}">マイページ</a> > パスワード変更
+        <a href="{{ route('mypage') }}">マイページ</a> > お気に入り
     </span>
 
-<div class="container  d-flex justify-content-center mt-3">
+<div class="container d-flex justify-content-center mt-3">
     <div class="w-75">
         <h1>お気に入り</h1>
 
@@ -30,17 +30,27 @@
                     </div>
                 </div>
             </div>
+
+            <!-- お気に入り解除ボタン -->
             <div class="col-md-2 d-flex align-items-center justify-content-end">
-                <a href="{{ route('products.favorite', $fav->favoriteable_id) }}" class="btn kadai_002-favorite-item-delete text-favorite w-100">
-                    削除
-                </a>
+                <form method="POST" action="{{ route('products.favorite', $fav->favoriteable_id) }}">
+                    @csrf
+                    <button type="submit" class="btn kadai_002-favorite-item-delete text-favorite w-100">
+                        解除
+                    </button>
+                </form>
             </div>
+
+            <!-- 予約ボタン -->
             <div class="col-md-3 d-flex align-items-center justify-content-end">
-                @csrf
-                <!-- 修正: product_id を渡す -->
-                <a href="{{ route('reservations.create', ['product' => $fav->favoriteable_id]) }}" class="btn kadai_002-reserve-button text-reserve w-100">
-                    予約する
-                </a>
+                @if(Auth::user()->subscribed('default'))
+                    <a href="{{ route('reservations.create', ['product' => $fav->favoriteable_id]) }}" class="btn kadai_002-reserve-button text-reserve w-100">
+                        予約する
+                    </a>
+                @else
+                    <!-- サブスク未登録者向けメッセージ -->
+                    <p class="alert alert-warning">予約機能を利用するには有料プランに登録してください。</p>
+                @endif
             </div>
             @endforeach
         </div>

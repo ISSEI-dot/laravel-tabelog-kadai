@@ -4,140 +4,106 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Laravel\Cashier\Exceptions\IncompletePayment;
-
 
 class SubscriptionController extends Controller
 {
-    // 有料プラン登録ページ
-    public function create()
+    // 支払い方法をセットアップするためのビューページを表示
+    public function showSubscriptionPage()
     {
-        $user = Auth::user();
-
-        // ページ表示のみ
-        return view('subscription.create');
-
+        $intent = Auth::user()->createSetupIntent();
+        return view('subscription.index', compact('intent'));
     }
 
-    // 有料プラン登録機能
-    public function store(Request $request)
+    // サブスクリプションの作成
+    public function processSubscription(Request $request)
     {
-        $user = Auth::user();
-
         try {
+            $user = Auth::user();
+
+            // 既に登録済みか確認
+            if ($user->subscribed('default')) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'すでにサブスクリプションに登録済みです。',
+                    'redirect' => route('mypage') // マイページのURLを返す
+                ], 400); // HTTP 400 (Bad Request)を返す
+            }
+
+            // Stripe顧客を作成
+            $user->createOrGetStripeCustomer();
+
+            // 支払い方法の追加
+            $paymentMethod = $request->payment_method;
+            $user->addPaymentMethod($paymentMethod);
+
+            // サブスクリプション作成
+            $user->newSubscription('default', 'price_1QZOJQBUjnqExYiQySxVRZ74') 
+                ->create($paymentMethod);
+
+            return response()->json(['status' => 'success']);
+        } catch (\Exception $e) {
+            \Log::error('Subscription Error: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }  
+    }
+
+    public function showEditPaymentPage()
+    {
+        $intent = auth()->user()->createSetupIntent(); // 支払い情報設定用のインテント作成
+        return view('subscription.edit', compact('intent')); // ビューにインテントを渡す
+    }
+
+    public function updatePaymentMethod(Request $request)
+    {
+        try {
+            // 認証ユーザーを取得
+            $user = Auth::user();
+
             // 支払い方法を更新
             $user->updateDefaultPaymentMethod($request->payment_method);
 
-            // 有料プラン登録
-            $user->newSubscription('premium_plan', 'price_1QZOJQBUjnqExYiQySxVRZ74')
-             ->create($request->payment_method);
-
-            // 登録完了メッセージ
-            return redirect()->route('mypage')->with('success', '有料プランへの登録が完了しました。');
-        } catch (\Laravel\Cashier\Exceptions\IncompletePayment $e) {
-            // 支払い未完了の場合は支払いページへリダイレクト
-            return redirect()->route('cashier.payment', $e->payment->id);
+            return response()->json(['status' => 'success']);
         } catch (\Exception $e) {
-            // エラーログとエラーメッセージ表示
-            \Log::error('サブスクリプション登録エラー: ' . $e->getMessage());
-            return back()->withErrors(['error' => '登録中に問題が発生しました。再度お試しください。']);
+            // エラーログを記録
+            \Log::error('Payment Update Error: ' . $e->getMessage());
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
     }
 
-
-
-    // お支払い方法編集ページ
-    public function edit()
+    // サブスクリプションのキャンセル
+    public function cancelSubscription()
     {
         $user = Auth::user();
-
-        // ユーザーが存在しない場合にエラーを返す
-        if (!$user) {
-            return redirect()->route('login')->withErrors(['error' => 'ログインしてください。']);
+        
+        // サブスクリプションを即時解約し、Stripeからも削除
+        if ($user->subscribed('default')) {
+            $user->subscription('default')->cancelNow(); // 即時解約
         }
 
-        try {
-            // SetupIntentを作成
-            $intent = $user->createSetupIntent();
-            return view('subscription.edit', compact('user', 'intent'));
-        } catch (\Exception $e) {
-            // エラーをログに記録
-            \Log::error('SetupIntentの作成中にエラーが発生しました: ' . $e->getMessage(), [
-                'user_id' => $user->id,
-            ]);
+        // Stripeの顧客情報も完全に削除
+        $user->deleteStripeCustomer(); 
 
-            // エラーメッセージをユーザーに表示
-            return back()->withErrors(['error' => '支払い方法編集ページを表示できませんでした。再度お試しください。']);
-        }
+        // データベース上の支払い情報をリセット
+        $user->forceFill([
+            'stripe_id' => null,
+            'pm_type' => null,
+            'pm_last_four' => null,
+        ])->save();
+
+        return redirect()->route('subscription.cancel')->with('status', 'サブスクリプションは正常に解約されました。');
     }
 
-
-    // お支払い方法更新機能
-    public function update(Request $request)
+    // サブスクリプションのステータス確認
+    public function checkSubscriptionStatus()
     {
         $user = Auth::user();
-
-        try {
-            // 支払い方法の更新
-            $user->updateDefaultPaymentMethod($request->payment_method);
-
-            // サブスクリプションの状態をチェック
-            $subscription = $user->subscription('premium_plan');
-            if (!$subscription) {
-                return back()->withErrors(['error' => 'サブスクリプションが見つかりません。']);
-            }
-
-            // 更新成功メッセージ
-            return redirect()->route('mypage')->with('flash_message', 'お支払い方法を変更しました。');
-        } catch (\Exception $e) {
-            // エラーログとエラーメッセージ表示
-            \Log::error('支払い方法の更新エラー: ' . $e->getMessage());
-            return back()->withErrors(['error' => 'お支払い方法の変更中にエラーが発生しました。']);
-        }
-    }
-
-
-
-    // 有料プラン解約ページ
-    public function cancel()
-    {
-        $user = Auth::user();
-
-        // サブスクリプション情報を取得
-        $subscription = $user->subscription('premium_plan');
-
-        // サブスクリプションが存在しない場合のエラーハンドリング
-        if (!$subscription) {
-            return redirect()->route('mypage')->withErrors(['status' => '現在、有料プランには登録されていません。']);
+        if ($user->subscribed('default')) {
+            return response()->json(['status' => 'active']);
         }
 
-        return view('subscription.cancel', compact('subscription'));
+        return response()->json(['status' => 'inactive']);
     }
-
-    // 有料プラン解約機能
-    public function destroy()
-    {
-        $user = Auth::user();
-
-        try {
-            // サブスクリプションの取得
-            $subscription = $user->subscription('premium_plan');
-
-            if (!$subscription) {
-                return back()->withErrors(['error' => '登録されていません。']);
-            }
-
-            // サブスクリプションを解約
-            $subscription->cancel();
-
-            // 解約メッセージ
-            return redirect()->route('mypage')->with('message', '有料プランを解約しました。');
-        } catch (\Exception $e) {
-            \Log::error('解約エラー: ' . $e->getMessage());
-            return back()->withErrors(['error' => '解約処理に失敗しました。再度お試しください。']);
-        }
-    }
-
 }
-
-

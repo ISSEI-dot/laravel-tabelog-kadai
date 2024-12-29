@@ -10,6 +10,14 @@
                 </div>
 
                 <div class="card-body">
+
+                    <!-- エラーメッセージの表示 -->
+                    @if (session('error'))
+                        <div class="alert alert-danger" role="alert">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
                     <!-- エラーメッセージの表示 -->
                     @if ($errors->any())
                         <div class="alert alert-danger">
@@ -57,11 +65,31 @@
                             <label for="reservation_time" class="form-label fw-bold">予約時間（必須）</label>
                             <select id="reservation_time" name="reservation_time" class="form-select" required>
                                 <option value="" disabled selected>予約する時間を選択してください</option>
-                                @for ($hour = (int)explode(':', $product->opening_time)[0]; $hour <= (int)explode(':', $product->closing_time)[0]; $hour++)
-                                    <option value="{{ sprintf('%02d:00', $hour) }}">{{ sprintf('%02d:00', $hour) }}</option>
-                                @endfor
+                                @php
+                                    use Carbon\Carbon;
+                        
+                                    // 開店・閉店時間をCarbonオブジェクトとして取得
+                                    $openingTime = Carbon::createFromFormat('H:i:s', $product->opening_time);
+                                    $closingTime = Carbon::createFromFormat('H:i:s', $product->closing_time);
+                                @endphp
+                                
+                                @if ($openingTime && $closingTime && $openingTime->lt($closingTime))
+                                    <!-- 営業時間内で1時間ごとに選択肢を生成 -->
+                                    @while ($openingTime->lte($closingTime))
+                                        <option value="{{ $openingTime->format('H:i') }}">
+                                            {{ $openingTime->format('H:i') }}
+                                        </option>
+                                        @php
+                                            $openingTime->addHour(); // 1時間刻みで追加
+                                        @endphp
+                                    @endwhile
+                                @else
+                                    <option disabled>営業時間が設定されていません</option>
+                                @endif
                             </select>
                         </div>
+                        
+                        
 
                         <!-- 送信ボタン -->
                         <div class="text-center">

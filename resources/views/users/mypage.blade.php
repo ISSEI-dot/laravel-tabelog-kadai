@@ -1,9 +1,16 @@
 @extends('layouts.app')
  
- @section('content')
+@section('content')
  <div class="container d-flex justify-content-center mt-3">
      <div class="w-50">
          <h1>マイページ</h1>
+
+         <!-- エラーメッセージの表示 -->
+        @if(session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
  
          <hr>
  
@@ -30,7 +37,7 @@
  
          <hr>
 
-         <!-- 有料プラン登録 -->
+         <!-- 有料会員登録 -->
         <div class="container">
             <div class="d-flex justify-content-between">
                 <div class="row">
@@ -39,13 +46,13 @@
                     </div>
                     <div class="col-9 d-flex align-items-center ms-2 mt-3">
                         <div class="d-flex flex-column">
-                            <label for="premium-plan">有料プラン登録</label>
-                            <p>有料プランに登録します</p>
+                            <label for="premium-plan">有料会員登録</label>
+                            <p>有料会員に登録します</p>
                         </div>
                     </div>
                 </div>
                 <div class="d-flex align-items-center">
-                    <a href="{{ route('subscription.create') }}">
+                    <a href="{{ route('subscription.index') }}">
                         <i class="fas fa-chevron-right fa-2x"></i>
                     </a>
                 </div>

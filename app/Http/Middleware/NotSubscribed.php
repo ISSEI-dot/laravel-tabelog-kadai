@@ -3,15 +3,23 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class NotSubscribed
 {
-    public function handle($request, Closure $next)
+    /**
+     * サブスク未登録者のみアクセスを許可する
+     */
+    public function handle(Request $request, Closure $next)
     {
-        if (Auth::check() && Auth::user()->subscribed('premium_plan')) {
-            return redirect()->route('mypage')->with('error', '既に有料プランに登録済みです。');
+        $user = Auth::user();
+
+        // サブスク未登録をチェック
+        if ($user && $user->subscribed('default')) {
+            return redirect()->route('mypage')->with('error', 'すでに登録済みのためアクセスできません。');
         }
+
         return $next($request);
     }
 }

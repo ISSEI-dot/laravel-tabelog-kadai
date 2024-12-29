@@ -33,11 +33,19 @@
              <i class="fas fa-user mr-1"></i>マイページ
            </a>
          </li>
+         @if(Auth::user()->subscribed('default')) <!-- サブスク登録者のみ表示 -->
          <li class="nav-item mr-5">
            <a class="nav-link nav-item-link favorite-link" href="{{ route('mypage.favorite') }}">
              <i class="far fa-heart"></i>お気に入り
            </a>
          </li>
+         @else
+         <!-- サブスク未登録者向けメッセージ -->
+         <li class="nav-item mr-5">
+           <span class="nav-link text-danger">お気に入りは有料プランのみ</span>
+         </li>
+         @endif
+         
          @endguest
 
         <li class="nav-item mr-5">
