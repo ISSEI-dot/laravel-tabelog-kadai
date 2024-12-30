@@ -12,6 +12,7 @@ use App\Notifications\CustomResetPassword;
 use Overtrue\LaravelFavorite\Traits\Favoriter;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Cashier\Billable;
+use Laravel\Cashier\SubscriptionItem;
 use Overtrue\LaravelFavorite\Favorite;
 
 class User extends Authenticatable implements MustVerifyEmail
@@ -66,9 +67,17 @@ class User extends Authenticatable implements MustVerifyEmail
      {
          return $this->hasMany(Review::class);
      }
-
-     public function favorites()
+     
+    // お気に入りリレーション
+    public function favorites()
     {
         return $this->hasMany(Favorite::class);
     }
+
+    // 予約履歴リレーション
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
+    }
+
 }

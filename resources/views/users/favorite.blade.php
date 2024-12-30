@@ -33,25 +33,31 @@
 
             <!-- お気に入り解除ボタン -->
             <div class="col-md-2 d-flex align-items-center justify-content-end">
-                <form method="POST" action="{{ route('products.favorite', $fav->favoriteable_id) }}">
-                    @csrf
-                    <button type="submit" class="btn kadai_002-favorite-item-delete text-favorite w-100">
-                        解除
-                    </button>
-                </form>
+                @if(Auth::user()->subscribed('default'))
+                    <form method="POST" action="{{ route('products.favorite', $fav->favoriteable_id) }}">
+                        @csrf
+                        <button type="submit" class="btn kadai_002-reserve-button text-reserve w-100">
+                            解除
+                        </button>
+                    </form>
+                @else
+                    <!-- サブスク未登録者向けメッセージ -->
+                    <div class="subscription-warning">※お気に入り解除機能は有料会員のみ利用可能です。</div>
+                @endif
             </div>
 
             <!-- 予約ボタン -->
-            <div class="col-md-3 d-flex align-items-center justify-content-end">
+            <div class="col-md-2 d-flex align-items-center justify-content-end">
                 @if(Auth::user()->subscribed('default'))
                     <a href="{{ route('reservations.create', ['product' => $fav->favoriteable_id]) }}" class="btn kadai_002-reserve-button text-reserve w-100">
                         予約する
                     </a>
                 @else
                     <!-- サブスク未登録者向けメッセージ -->
-                    <p class="alert alert-warning">予約機能を利用するには有料プランに登録してください。</p>
+                    <div class="subscription-warning">※予約機能は有料会員のみ利用可能です。</div>
                 @endif
             </div>
+        </div>
             @endforeach
         </div>
 

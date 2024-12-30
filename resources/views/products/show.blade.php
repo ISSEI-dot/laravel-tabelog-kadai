@@ -50,7 +50,7 @@
                         予約する
                     </a>
                 @else
-                    <p class="alert alert-warning">予約機能は有料プラン登録者のみ利用可能です。</p>
+                    <p class="alert alert-warning">※予約機能は、有料会員に登録する必要があります。</p>
                 @endif
 
                 <!-- お気に入り機能 -->
@@ -66,7 +66,7 @@
                     </button>
                 </form>
                 @else
-                    <p class="alert alert-warning">お気に入り機能は有料プラン登録者のみ利用可能です。</p>
+                    <p class="alert alert-warning">※お気に入り機能は、有料会員に登録する必要があります。</p>
                 @endif
             </div>
             @endauth
@@ -132,7 +132,7 @@
                 </div>
             </div>
             @else
-                <p class="alert alert-warning">レビューを投稿するには、有料プランに登録する必要があります。</p>
+                <p class="alert alert-warning">※レビューを投稿するには、有料会員に登録する必要があります。</p>
             @endif
             @endauth
         </div>

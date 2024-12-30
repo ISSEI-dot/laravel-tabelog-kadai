@@ -39,11 +39,7 @@
              <i class="far fa-heart"></i>お気に入り
            </a>
          </li>
-         @else
-         <!-- サブスク未登録者向けメッセージ -->
-         <li class="nav-item mr-5">
-           <span class="nav-link text-danger">お気に入りは有料プランのみ</span>
-         </li>
+         
          @endif
          
          @endguest

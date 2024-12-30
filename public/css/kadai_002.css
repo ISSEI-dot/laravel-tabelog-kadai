@@ -282,7 +282,7 @@
 }
 
 .kadai_002-favorite-button {
-  margin-right: 40px;
+  margin-right: 80px;
   border-radius: 2px;
   border: solid 1px #0fbe9f;
   background-color: #ffffff;
@@ -293,9 +293,11 @@
 }
 
 .kadai_002-favorite-item-delete {
+  margin-right: 80px;
   border-radius: 2px;
   border: solid 1px #0fbe9f;
   background-color: #ffffff;
+  white-space: nowrap; /* テキストを折り返さない */
 }
 
 .kadai_002-sidebar-category-label {
@@ -537,4 +539,14 @@
 
 .btn-more:hover {
   background-color: #00a1b3;
+}
+
+.subscription-warning {
+  width: 200px;           /* 固定幅 */
+  padding: 10px;          /* 内側の余白 */
+  text-align: center;     /* テキストを中央揃え */
+  background-color: #fff3cd; /* 背景色 (黄色系) */
+  border: 1px solid #ffeeba; /* 境界線の色 */
+  border-radius: 5px;     /* 角を丸くする */
+  font-size: 14px;        /* 文字サイズ */
 }

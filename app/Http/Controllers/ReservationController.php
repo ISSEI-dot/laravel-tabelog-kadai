@@ -46,7 +46,7 @@ class ReservationController extends Controller
         $regular_holidays = explode(',', $product->regular_holiday); // データベースの定休日リストを取得
 
         if (in_array($reservation_day, $regular_holidays)) {
-            return back()->withErrors(['error' => 'この店舗は定休日です。']);
+            return back()->withErrors(['error' => '指定日はこの店舗の定休日です。']);
         }
 
         // 営業時間のチェック
@@ -77,8 +77,7 @@ class ReservationController extends Controller
     {
         // ログイン中のユーザーが関連する product_id の予約を取得
         // 例: `products` テーブルでユーザーと関連付けされた user_id を利用する場合
-        $reservations = Reservation::where('user_id', auth()->id())->orderBy('reservation_date', 'desc')
-        ->paginate(9); // ページネーションを追加
+        $reservations = Reservation::where('user_id', auth()->id())->orderBy('reservation_date', 'desc')->paginate(6); // ページネーションを追加
 
         // ビューにデータを渡して表示
         return view('reservations.index', compact('reservations'));

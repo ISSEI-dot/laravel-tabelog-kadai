@@ -69,10 +69,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/subscription/edit', [SubscriptionController::class, 'showEditPaymentPage'])->name('subscription.edit');
         Route::post('/subscription/edit', [SubscriptionController::class, 'updatePaymentMethod'])->name('subscription.update');
 
+        // 解約確認ページのルート (GET)
         Route::get('/subscription/cancel', function () {
-            return view('subscription.cancel');
-        })->name('subscription.cancel');
-        Route::post('/subscription/cancel', [SubscriptionController::class, 'cancelSubscription'])->name('subscription.cancel.process');
+            return view('subscription.cancel'); // 確認ページを表示
+        })->name('subscription.cancel.view');
+
+        // 解約処理のルート (POST)
+        Route::post('/subscription/cancel', [SubscriptionController::class, 'cancelSubscription'])->name('subscription.cancel');
     
         //予約履歴ページ（サブスク登録者のみ）
         Route::get('/mypage/reservations', [ReservationController::class, 'index'])->name('mypage.reservations');

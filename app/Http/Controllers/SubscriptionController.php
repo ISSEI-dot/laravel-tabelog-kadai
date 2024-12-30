@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class SubscriptionController extends Controller
 {
@@ -73,18 +74,24 @@ class SubscriptionController extends Controller
         }
     }
 
-    // サブスクリプションのキャンセル
+    // サブスクリプションの即時解約
     public function cancelSubscription()
     {
         $user = Auth::user();
-        
+
         // サブスクリプションを即時解約し、Stripeからも削除
         if ($user->subscribed('default')) {
             $user->subscription('default')->cancelNow(); // 即時解約
         }
 
+        //サブスクリプションアイテムの削除
+        DB::table('subscription_items')
+            ->whereIn('subscription_id', $user->subscriptions()->pluck('id'))
+            ->delete();
+
         // Stripeの顧客情報も完全に削除
-        $user->deleteStripeCustomer(); 
+        $stripeCustomer = $user->asStripeCustomer();
+        $stripeCustomer->delete(); // Stripe APIで削除
 
         // データベース上の支払い情報をリセット
         $user->forceFill([
@@ -93,7 +100,15 @@ class SubscriptionController extends Controller
             'pm_last_four' => null,
         ])->save();
 
-        return redirect()->route('subscription.cancel')->with('status', 'サブスクリプションは正常に解約されました。');
+        // subscriptions テーブルの削除
+        $user->subscriptions()->delete(); 
+
+        // 予約履歴とお気に入りも削除
+        $user->reservations()->delete();
+        $user->favorites()->delete();
+
+        // 解約完了メッセージとともに遷移
+        return redirect()->route('mypage')->with('status', 'サブスクリプションは正常に解約されました。');
     }
 
     // サブスクリプションのステータス確認

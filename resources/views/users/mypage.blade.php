@@ -61,6 +61,9 @@
 
         <hr>
 
+        <!-- サブスク登録者のみ表示 -->
+        @if(Auth::user()->subscribed('default'))
+
         <!-- お支払い方法編集 -->
         <div class="container">
             <div class="d-flex justify-content-between">
@@ -95,17 +98,18 @@
                     <div class="col-9 d-flex align-items-center ms-2 mt-3">
                         <div class="d-flex flex-column">
                             <label for="cancel-subscription">有料会員解約</label>
-                            <p>有料会員を解約します</p>
-                        </div>
+                        <p>有料会員を解約します</p>
                     </div>
                 </div>
-                <div class="d-flex align-items-center">
-                    <a href="{{ route('subscription.cancel') }}">
-                        <i class="fas fa-chevron-right fa-2x"></i>
-                    </a>
-                </div>
+            </div>
+            <div class="d-flex align-items-center">
+                <!-- 解約確認ページへ遷移 -->
+                <a href="{{ route('subscription.cancel.view') }}">
+                    <i class="fas fa-chevron-right fa-2x"></i>
+                </a>
             </div>
         </div>
+    </div>
 
         <hr>
  
@@ -154,6 +158,8 @@
         </div>
  
          <hr>
+
+         @endif
 
          <div class="container">
              <div class="d-flex justify-content-between">
