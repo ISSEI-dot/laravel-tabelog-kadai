@@ -21,8 +21,11 @@ class UserFactory extends Factory
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+            'password' => bcrypt('password'), // デフォルトパスワード
             'remember_token' => Str::random(10),
+            'address' => fake()->address(),        // 必須のaddressフィールド追加
+            'postal_code' => '123-4567',           // 必須の郵便番号フィールド追加
+            'phone' => '09012345678',              // 必須の電話番号フィールド追加
         ];
     }
 

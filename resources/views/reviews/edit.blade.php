@@ -5,6 +5,7 @@
     <h1>レビューの編集</h1>
     <form method="POST" action="{{ route('reviews.update', $review) }}">
         @csrf
+        @method('PUT')
         <div class="form-group">
             <label for="score">評価</label>
             <select name="score" id="score" class="form-control">

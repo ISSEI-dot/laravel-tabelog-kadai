@@ -23,7 +23,9 @@ class ReviewController extends Controller
         }
 
         $request->validate([
-            'content' => 'required'
+            'score' => 'required|integer|min:1|max:5',
+            'content' => 'required|string|max:255',
+            'product_id' => 'required|exists:products,id',
         ]);
 
         $review = new Review();
@@ -33,7 +35,8 @@ class ReviewController extends Controller
         $review->score = $request->input('score');
         $review->save();
 
-        return back();
+        return redirect()->route('products.show', $review->product_id)
+                         ->with('success', 'レビューを投稿しました！');
     }
 
     public function edit(Review $review)

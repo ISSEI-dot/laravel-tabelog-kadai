@@ -29,15 +29,4 @@ class ProductFactory extends Factory
         ];
     }
 
-    // 郵便番号・住所・電話番号だけを生成するメソッドを追加
-    public function onlyContactInfo()
-    {
-        return $this->state(function () {
-            return [
-                'postal_code' => $this->faker->postcode,
-                'address' => $this->faker->address,
-                'phone_number' => $this->faker->phoneNumber,
-            ];
-        });
-    }
 }

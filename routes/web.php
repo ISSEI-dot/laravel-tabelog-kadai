@@ -39,7 +39,7 @@ Route::post('reviews', [ReviewController::class, 'store'])->name('reviews.store'
 
 // 編集用
 Route::get('/reviews/{review}/edit', [ReviewController::class, 'edit'])->name('reviews.edit');
-Route::post('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
+Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
 
 // 削除用
 Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');

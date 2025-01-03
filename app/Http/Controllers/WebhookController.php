@@ -60,7 +60,7 @@ class WebhookController extends Controller
             }
 
             // 正常応答
-            return response()->json(['status' => 'success']);
+            return response()->json(['status' => 'success'],200);
         } catch (SignatureVerificationException $e) {
             // 署名検証失敗エラーハンドリング
             Log::error('Webhook署名検証失敗: ' . $e->getMessage());
