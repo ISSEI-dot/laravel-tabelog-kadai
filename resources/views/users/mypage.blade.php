@@ -36,6 +36,8 @@
          </div>
  
          <hr>
+         <!-- サブスク未登録者のみ表示 -->
+         @if(!Auth::user()->subscribed('default'))
 
          <!-- 有料会員登録 -->
         <div class="container">
@@ -60,6 +62,8 @@
         </div>
 
         <hr>
+
+        @endif
 
         <!-- サブスク登録者のみ表示 -->
         @if(Auth::user()->subscribed('default'))
